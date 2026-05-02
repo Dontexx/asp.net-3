@@ -1,0 +1,18 @@
+﻿@page
+@model IndexModel
+
+<h2>Хрестики-нулики</h2>
+
+<form method="post">
+    <div style="display:grid; grid-template-columns: repeat(3, 80px); gap:5px;">
+        @for (int i = 0; i < 9; i++)
+        {
+            <button type="submit" name="move" value="@i" style="height:80px; font-size:24px;">
+                @Model.Board[i]
+            </button>
+        }
+    </div>
+</form>
+
+<br />
+<h3>@Model.Status</h3>
