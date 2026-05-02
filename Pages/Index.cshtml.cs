@@ -5,18 +5,30 @@ using System;
 public class IndexModel : PageModel
 {
     [BindProperty]
-    public char[] Board { get; set; } = new char[9];
+    public char[] Board { get; set; }
 
     public string Status { get; set; } = "";
 
     public void OnGet()
     {
-        for (int i = 0; i < 9; i++)
-            Board[i] = ' ';
+        if (TempData["board"] != null)
+        {
+            Board = TempData["board"].ToString().ToCharArray();
+        }
+        else
+        {
+            Board = new char[9];
+            for (int i = 0; i < 9; i++) Board[i] = ' ';
+        }
     }
 
-    public void OnPost(int move)
+    public IActionResult OnPost(int move)
     {
+        Board = TempData["board"]?.ToString().ToCharArray() ?? new char[9];
+
+        for (int i = 0; i < 9; i++)
+            if (Board[i] == '\0') Board[i] = ' ';
+
         if (Board[move] == ' ')
         {
             Board[move] = 'X';
@@ -24,7 +36,8 @@ public class IndexModel : PageModel
             if (CheckWin('X'))
             {
                 Status = "Ви перемогли!";
-                return;
+                TempData["board"] = new string(Board);
+                return Page();
             }
 
             ComputerMove();
@@ -32,7 +45,8 @@ public class IndexModel : PageModel
             if (CheckWin('O'))
             {
                 Status = "Комп'ютер переміг!";
-                return;
+                TempData["board"] = new string(Board);
+                return Page();
             }
 
             if (IsDraw())
@@ -40,6 +54,9 @@ public class IndexModel : PageModel
                 Status = "Нічия!";
             }
         }
+
+        TempData["board"] = new string(Board);
+        return Page();
     }
 
     void ComputerMove()
